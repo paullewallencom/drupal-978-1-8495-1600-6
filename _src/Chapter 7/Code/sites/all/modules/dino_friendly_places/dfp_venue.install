@@ -1,0 +1,121 @@
+<?php
+
+function dfp_venue_install() {
+
+  $t = get_t();
+
+  $dino_friendly_places_venue = array(
+    'type' => 'dino_friendly_places_venue',
+    'name' => $t('Dinosaur friendly place'),
+    'base' => 'node_content',
+    'description' => $t('A dinosaur friendly place.'),
+    'body_label' => $t('Venue Description')
+  );
+
+  $content_type = node_type_set_defaults($dino_friendly_places_venue);
+  node_add_body_field($content_type);
+
+  node_type_save($content_type);
+
+  $body_instance = field_info_instance('node', 'body', 'dino_friendly_places_venue');
+
+  $body_instance['display']['example_node_list'] = array(
+    'label' => 'hidden',
+    'type' => 'text_summary_or_trimmed',
+  );
+
+  field_update_instance($body_instance);
+
+  foreach (_dfp_venue_installed_fields() as $field) {
+    field_create_field($field);
+  }
+
+  foreach (_dfp_venue_installed_instances() as $instance) {
+    $instance['entity_type'] = 'node';
+    $instance['bundle'] = $dino_friendly_places_venue['type'];
+    field_create_instance($instance);
+  }
+}
+
+function _dfp_venue_installed_fields() {
+  $t = get_t();
+  return array(
+    'dfp_venue_longitude' => array(
+      'field_name' => 'dfp_venue_longitude',
+      'cardinality' => 1,
+      'type'        => 'number_float',
+      'settings'    => array(
+        'max_length' => 60,
+      ),
+    ),
+    'dfp_venue_latitude' => array(
+      'field_name' => 'dfp_venue_latitude',
+      'cardinality' => 1,
+      'type'        => 'number_float',
+      'settings'    => array(
+        'max_length' => 60,
+      ),
+    ),
+  );
+}
+
+function _dfp_venue_installed_instances() {
+  $t = get_t();
+  return array(
+    'dfp_venue_longitude' => array(
+      'field_name' => 'dfp_venue_longitude',
+      'label'       => $t('The longitude for the central point of the map.'),
+      'widget'      => array(
+        'type'    => 'text_textfield',
+      ),
+      'display' => array(
+        'example_node_list' => array(
+          'label' => 'hidden',
+          'type' => 'hidden',
+        ),
+      ),
+    ),
+    
+    'dfp_venue_latitude' => array(
+      'field_name' => 'dfp_venue_latitude',
+      'label'       => $t('The latitude for the central point of the map.'),
+      'widget'      => array(
+        'type'    => 'text_textfield',
+      ),
+      'display' => array(
+        'example_node_list' => array(
+          'label' => 'hidden',
+          'type' => 'hidden',
+        ),
+      ),
+    ),
+    
+   
+  );
+}
+
+
+function dfp_venue_uninstall() {
+
+  $sql = 'SELECT nid FROM {node} n WHERE n.type = :type';
+  $result = db_query($sql, array(':type' => 'dino_friendly_places_venue'));
+  $nids = array();
+  foreach ($result as $row) {
+    $nids[] = $row->nid;
+  }
+
+  node_delete_multiple($nids);
+
+  foreach (array_keys(_dfp_venue_installed_fields()) as $field) {
+    field_delete_field($field);
+  }
+
+  $instances = field_info_instances('node', 'dino_friendly_places_venue');
+  foreach ($instances as $instance_name => $instance) {
+    field_delete_instance($instance);
+  }
+
+  node_type_delete('dino_friendly_places_venue');
+
+  field_purge_batch(1000);
+}

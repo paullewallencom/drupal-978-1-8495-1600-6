@@ -1,0 +1,4 @@
+name = DFP Map
+description = A map of various dinosaur friendly places
+core = 7.x
+package = "Dinosaur Friendly Places"

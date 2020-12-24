@@ -1,0 +1,4 @@
+name = DFP Venue
+description = A dinosaur friendly venue
+core = 7.x
+package = "Dinosaur Friendly Places"

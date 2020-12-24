@@ -1,0 +1,27 @@
+<?php
+
+/**
+ * Implements hook_help
+ * Displays help and module information
+ * @param path $path
+ * @param arg array that holds the current path
+ */
+function dfp_venue_help( $path, $arg ) {
+	switch( $path )
+	{
+		case 'admin/help#dino_friendly_places':
+			return '<p>' . t("Lists dinosaur friendly places created by users") . '</p>';
+			break;
+	}	
+}
+
+function dfp_venue_block_info() {
+	$blocks['recent_dino_friendly'] = array(
+	
+		'info' => t('Recent Dinosaur Friendly Places'),
+		'cache' => DRUPAL_CACHE_PER_ROLE,
+	
+	);
+	
+	return $blocks;
+}
